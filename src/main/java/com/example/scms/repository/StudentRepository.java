@@ -12,6 +12,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Optional<Student> findByEmail(String email);
     Boolean existsByStudentCode(String studentCode);
     Boolean existsByEmail(String email);
-    List<Student> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String firstName, String lastName);
+    List<Student> findByFirstNameIgnoreCaseOrLastNameIgnoreCase(String firstName, String lastName);
     List<Student> findByStatus(StudentStatus status);
 }
