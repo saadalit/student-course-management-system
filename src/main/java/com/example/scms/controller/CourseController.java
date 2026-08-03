@@ -2,6 +2,7 @@ package com.example.scms.controller;
 
 import com.example.scms.dto.CourseRequest;
 import com.example.scms.dto.CourseResponse;
+import com.example.scms.entity.enums.UserRole;
 import com.example.scms.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

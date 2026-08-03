@@ -3,6 +3,8 @@ package com.example.scms.service.impl;
 import com.example.scms.dto.StudentRequest;
 import com.example.scms.dto.StudentResponse;
 import com.example.scms.entity.Student;
+import com.example.scms.entity.enums.UserRole;
+import com.example.scms.exception.AccessDeniedException;
 import com.example.scms.exception.DuplicateRecordException;
 import com.example.scms.exception.ResourceNotFoundException;
 import com.example.scms.repository.StudentRepository;

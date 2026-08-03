@@ -3,6 +3,8 @@ package com.example.scms.service.impl;
 import com.example.scms.dto.CourseRequest;
 import com.example.scms.dto.CourseResponse;
 import com.example.scms.entity.Course;
+import com.example.scms.entity.enums.UserRole;
+import com.example.scms.exception.AccessDeniedException;
 import com.example.scms.exception.DuplicateRecordException;
 import com.example.scms.exception.ResourceNotFoundException;
 import com.example.scms.repository.CourseRepository;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
+
 
     @Override
     public CourseResponse createCourse(CourseRequest courseRequest) {
