@@ -3,18 +3,21 @@ package com.example.scms.service.impl;
 import com.example.scms.dto.StudentRequest;
 import com.example.scms.dto.StudentResponse;
 import com.example.scms.entity.Student;
-import com.example.scms.entity.enums.UserRole;
-import com.example.scms.exception.AccessDeniedException;
 import com.example.scms.exception.DuplicateRecordException;
 import com.example.scms.exception.ResourceNotFoundException;
 import com.example.scms.repository.StudentRepository;
 import com.example.scms.service.StudentService;
+import com.example.scms.specification.StudentSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,13 +27,13 @@ public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
 
     @Override
-    public StudentResponse createStudent(StudentRequest studentRequest){
+    public StudentResponse createStudent(StudentRequest studentRequest) {
         log.info("Creating a new student with code: {}", studentRequest.getStudentCode());
-        if(studentRepository.existsByStudentCode(studentRequest.getStudentCode())){
+        if (studentRepository.existsByStudentCode(studentRequest.getStudentCode())) {
             log.error("Student with code {} already exists", studentRequest.getStudentCode());
             throw new DuplicateRecordException("Student with this code already exists");
         }
-        if(studentRepository.existsByEmail(studentRequest.getEmail())){
+        if (studentRepository.existsByEmail(studentRequest.getEmail())) {
             log.error("Student with email {} already exists", studentRequest.getEmail());
             throw new DuplicateRecordException("Student with this email already exists");
         }
@@ -42,15 +45,32 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentResponse> getAllStudents(){
-        log.info("Fetching all students");
-        return studentRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<StudentResponse> getAllStudents(
+            Long id,
+            String studentCode,
+            String firstName,
+            String lastName,
+            String email,
+            String phone,
+            String gender,
+            String status,
+            Pageable pageable
+    ) {
+        log.info("Fetching students - id: '{}', code: '{}', firstName: '{}', lastName: '{}', email: '{}', phone: '{}', gender: '{}', status: '{}', pageable: {}",
+                id, studentCode, firstName, lastName, email, phone, gender, status, pageable);
+
+        Specification<Student> spec = StudentSpecification.filterStudents(
+                id, studentCode, firstName, lastName, email, phone, gender, status
+        );
+
+        return studentRepository.findAll(spec, pageable)
+                .map(this::mapToResponse);
     }
 
     @Override
-    public StudentResponse getStudentById(Long id){
+    @Transactional(readOnly = true)
+    public StudentResponse getStudentById(Long id) {
         log.info("Fetching student with ID: {}", id);
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> {
@@ -61,7 +81,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public StudentResponse updateStudent(Long id, StudentRequest studentRequest){
+    public StudentResponse updateStudent(Long id, StudentRequest studentRequest) {
         log.info("Updating student with ID: {}", id);
         Student existingStudent = studentRepository.findById(id)
                 .orElseThrow(() -> {
@@ -69,13 +89,13 @@ public class StudentServiceImpl implements StudentService {
                     return new ResourceNotFoundException("Student not found");
                 });
 
-        if(!existingStudent.getStudentCode().equals(studentRequest.getStudentCode()) &&
-                studentRepository.existsByStudentCode(studentRequest.getStudentCode())){
+        if (!existingStudent.getStudentCode().equals(studentRequest.getStudentCode()) &&
+                studentRepository.existsByStudentCode(studentRequest.getStudentCode())) {
             log.error("Student with code {} already exists", studentRequest.getStudentCode());
             throw new DuplicateRecordException("Student with this code already exists");
         }
-        if(!existingStudent.getEmail().equals(studentRequest.getEmail()) &&
-                studentRepository.existsByEmail(studentRequest.getEmail())){
+        if (!existingStudent.getEmail().equals(studentRequest.getEmail()) &&
+                studentRepository.existsByEmail(studentRequest.getEmail())) {
             log.error("Student with email {} already exists", studentRequest.getEmail());
             throw new DuplicateRecordException("Student with this email already exists");
         }
@@ -94,7 +114,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public void deleteStudent(Long id){
+    public void deleteStudent(Long id) {
         log.info("Deleting student with ID: {}", id);
         Student existingStudent = studentRepository.findById(id)
                 .orElseThrow(() -> {
@@ -105,16 +125,9 @@ public class StudentServiceImpl implements StudentService {
         log.info("Student deleted successfully with ID: {}", id);
     }
 
-    @Override
-    public List<StudentResponse> searchStudentsByName(String name){
-        log.info("Searching students by name: {}", name);
-        return studentRepository.findByFirstNameIgnoreCaseOrLastNameIgnoreCase(name, name).stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
     private StudentResponse mapToResponse(Student student) {
-        return new StudentResponse(student.getId(),
+        return new StudentResponse(
+                student.getId(),
                 student.getStudentCode(),
                 student.getFirstName(),
                 student.getLastName(),
@@ -122,7 +135,8 @@ public class StudentServiceImpl implements StudentService {
                 student.getPhone(),
                 student.getDateOfBirth(),
                 student.getGender(),
-                student.getStatus());
+                student.getStatus()
+        );
     }
 
     private Student mapToEntity(StudentRequest studentRequest) {

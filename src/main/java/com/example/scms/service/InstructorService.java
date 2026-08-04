@@ -2,15 +2,26 @@ package com.example.scms.service;
 
 import com.example.scms.dto.InstructorRequest;
 import com.example.scms.dto.InstructorResponse;
-import com.example.scms.entity.enums.UserRole;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface InstructorService {
 
     InstructorResponse createInstructor(InstructorRequest instructorRequest);
-    List<InstructorResponse> getAllInstructors();
+
+    // Updated to handle Search, Filter, Pagination & Sorting in one clean service contract
+    Page<InstructorResponse> getAllInstructors(
+            Long id,
+            String name,
+            String instructorCode,
+            String email,
+            String department,
+            String designation,
+            Pageable pageable
+    );
     InstructorResponse getInstructorById(Long id);
+
     InstructorResponse updateInstructor(Long id, InstructorRequest instructorRequest);
+
     void deleteInstructor(Long id);
 }

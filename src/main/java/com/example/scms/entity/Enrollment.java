@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
@@ -14,7 +16,9 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Enrollment {
+@SQLDelete(sql = "UPDATE enrollments SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
+public class Enrollment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,4 +34,7 @@ public class Enrollment {
 
     @Column(name = "enrollment_date", nullable = false)
     private LocalDate enrollmentDate;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 }

@@ -3,18 +3,18 @@ package com.example.scms.service.impl;
 import com.example.scms.dto.CourseRequest;
 import com.example.scms.dto.CourseResponse;
 import com.example.scms.entity.Course;
-import com.example.scms.entity.enums.UserRole;
-import com.example.scms.exception.AccessDeniedException;
 import com.example.scms.exception.DuplicateRecordException;
 import com.example.scms.exception.ResourceNotFoundException;
 import com.example.scms.repository.CourseRepository;
 import com.example.scms.service.CourseService;
+import com.example.scms.specification.CourseSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -23,12 +23,11 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
 
-
     @Override
     public CourseResponse createCourse(CourseRequest courseRequest) {
         log.info("Creating a new course with code: {}", courseRequest.getCourseCode());
 
-        if(courseRepository.existsByCourseCode(courseRequest.getCourseCode())){
+        if (courseRepository.existsByCourseCode(courseRequest.getCourseCode())) {
             log.error("Course with code {} already exists", courseRequest.getCourseCode());
             throw new DuplicateRecordException("Course with this code already exists");
         }
@@ -40,14 +39,29 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseResponse> getAllCourses() {
-        log.info("Fetching all courses");
-        return courseRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<CourseResponse> getAllCourses(
+            Long id,
+            String courseName,
+            String courseCode,
+            String department,
+            String semester,
+            Integer creditHours,
+            Pageable pageable
+    ) {
+        log.info("Fetching courses - id: '{}', name: '{}', code: '{}', dept: '{}', semester: '{}', credits: '{}', pageable: {}",
+                id, courseName, courseCode, department, semester, creditHours, pageable);
+
+        Specification<Course> spec = CourseSpecification.filterCourses(
+                id, courseName, courseCode, department, semester, creditHours
+        );
+
+        return courseRepository.findAll(spec, pageable)
+                .map(this::mapToResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CourseResponse getCourseById(Long id) {
         log.info("Fetching course with ID: {}", id);
         Course course = courseRepository.findById(id)
@@ -92,14 +106,6 @@ public class CourseServiceImpl implements CourseService {
         log.info("Course deleted successfully with ID: {}", id);
     }
 
-    @Override
-    public List<CourseResponse> searchCoursesByDepartment(String department) {
-        log.info("Searching courses in department: {}", department);
-        return courseRepository.findByDepartmentIgnoreCase(department).stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
     private CourseResponse mapToResponse(Course course) {
         return new CourseResponse(
                 course.getId(),
@@ -120,5 +126,4 @@ public class CourseServiceImpl implements CourseService {
         course.setSemester(courseRequest.getSemester());
         return course;
     }
-
 }

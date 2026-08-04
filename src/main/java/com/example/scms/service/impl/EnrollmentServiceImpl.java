@@ -2,6 +2,7 @@ package com.example.scms.service.impl;
 
 import com.example.scms.dto.CourseResponse;
 import com.example.scms.dto.EnrollmentRequest;
+import com.example.scms.dto.EnrollmentResponse;
 import com.example.scms.dto.StudentResponse;
 import com.example.scms.entity.Course;
 import com.example.scms.entity.Enrollment;
@@ -12,14 +13,16 @@ import com.example.scms.repository.CourseRepository;
 import com.example.scms.repository.EnrollmentRepository;
 import com.example.scms.repository.StudentRepository;
 import com.example.scms.service.EnrollmentService;
+import com.example.scms.specification.EnrollmentSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -78,58 +81,30 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CourseResponse> getCoursesByStudentId(Long studentId) {
-        log.info("Fetching courses for Student ID: {}", studentId);
+    public Page<EnrollmentResponse> getAllEnrollments(
+            Long id,
+            Long studentId,
+            Long courseId,
+            LocalDate enrollmentDate,
+            Pageable pageable
+    ) {
+        log.info("Fetching enrollments - id: '{}', studentId: '{}', courseId: '{}', date: '{}', pageable: {}",
+                id, studentId, courseId, enrollmentDate, pageable);
 
-        // Verify Student exists
-        if (!studentRepository.existsById(studentId)) {
-            throw new ResourceNotFoundException("Student not found with ID: " + studentId);
-        }
+        Specification<Enrollment> spec = EnrollmentSpecification.filterEnrollments(id, studentId, courseId, enrollmentDate);
 
-        List<Enrollment> enrollments = enrollmentRepository.findByStudentId(studentId);
-
-        return enrollments.stream()
-                .map(enrollment -> {
-                    Course course = enrollment.getCourse();
-                    return new CourseResponse(
-                            course.getId(),
-                            course.getCourseCode(),
-                            course.getCourseName(),
-                            course.getCreditHours(),
-                            course.getDepartment(),
-                            course.getSemester()
-                    );
-                })
-                .collect(Collectors.toList());
+        return enrollmentRepository.findAll(spec, pageable)
+                .map(this::mapToResponse);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<StudentResponse> getStudentsByCourseId(Long courseId) {
-        log.info("Fetching students for Course ID: {}", courseId);
-
-        // Verify Course exists
-        if (!courseRepository.existsById(courseId)) {
-            throw new ResourceNotFoundException("Course not found with ID: " + courseId);
-        }
-
-        List<Enrollment> enrollments = enrollmentRepository.findByCourseId(courseId);
-
-        return enrollments.stream()
-                .map(enrollment -> {
-                    Student student = enrollment.getStudent();
-                    return new StudentResponse(
-                            student.getId(),
-                            student.getStudentCode(),
-                            student.getFirstName(),
-                            student.getLastName(),
-                            student.getEmail(),
-                            student.getPhone(),
-                            student.getDateOfBirth(),
-                            student.getGender(),
-                            student.getStatus()
-                    );
-                })
-                .collect(Collectors.toList());
+    private EnrollmentResponse mapToResponse(Enrollment enrollment) {
+        return new EnrollmentResponse(
+                enrollment.getId(),
+                enrollment.getStudent() != null ? enrollment.getStudent().getId() : null,
+                enrollment.getStudent() != null ? enrollment.getStudent().getFirstName() + " " + enrollment.getStudent().getLastName() : null,
+                enrollment.getCourse() != null ? enrollment.getCourse().getId() : null,
+                enrollment.getCourse() != null ? enrollment.getCourse().getCourseName() : null,
+                enrollment.getEnrollmentDate()
+        );
     }
 }

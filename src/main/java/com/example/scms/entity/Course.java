@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "courses")
@@ -16,7 +18,9 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Course {
+@SQLDelete(sql = "UPDATE courses SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
+public class Course extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,4 +45,7 @@ public class Course {
 
     @Column
     private String semester;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 }

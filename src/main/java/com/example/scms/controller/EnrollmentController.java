@@ -2,15 +2,21 @@ package com.example.scms.controller;
 
 import com.example.scms.dto.CourseResponse;
 import com.example.scms.dto.EnrollmentRequest;
+import com.example.scms.dto.EnrollmentResponse;
 import com.example.scms.dto.StudentResponse;
 import com.example.scms.service.EnrollmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/enrollments")
@@ -28,20 +34,26 @@ public class EnrollmentController {
     @DeleteMapping("/student/{studentId}/course/{courseId}")
     public ResponseEntity<String> unenrollStudent(@PathVariable Long studentId, @PathVariable Long courseId) {
         enrollmentService.unenrollStudent(studentId, courseId);
-        return new ResponseEntity<>("Student unenrolled successfully", HttpStatus.OK);
+        return ResponseEntity.ok("Student unenrolled successfully");
     }
 
-    @GetMapping("/student/{studentId}/course")
-    public ResponseEntity<List<CourseResponse>> getCoursesByStudentID(@PathVariable Long studentId) {
-        List<CourseResponse> courses = enrollmentService.getCoursesByStudentId(studentId);
-        return new ResponseEntity<>(courses, HttpStatus.OK);
-    }
+    @GetMapping
+    public ResponseEntity<Page<EnrollmentResponse>> getAllEnrollments(
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(required = false) Long courseId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate enrollmentDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-    @GetMapping("/course/{courseId}/student")
-    public ResponseEntity<List<StudentResponse>> getStudentsByCourseID(@PathVariable Long courseId)
-    {
-        List<StudentResponse> students = enrollmentService.getStudentsByCourseId(courseId);
-        return new ResponseEntity<>(students, HttpStatus.OK);
+        Page<EnrollmentResponse> enrollments = enrollmentService.getAllEnrollments(
+                id, studentId, courseId, enrollmentDate, pageable
+        );
+        return ResponseEntity.ok(enrollments);
     }
-
 }
