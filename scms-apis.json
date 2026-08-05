@@ -1,0 +1,536 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "scms-apis",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/api/students": {
+      "get": {
+        "summary": "Get All Students",
+        "responses": {}
+      },
+      "post": {
+        "summary": "Add Student",
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "studentCode": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "dateOfBirth": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "gender": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "studentCode": "STD-1006",
+                "firstName": "Hamza",
+                "lastName": "Shah",
+                "email": "hamza.shah@example.com",
+                "phone": "03009876543",
+                "dateOfBirth": "2002-04-12",
+                "gender": "Male",
+                "status": "ACTIVE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/students/99": {
+      "get": {
+        "summary": "Get Student By ID",
+        "responses": {}
+      }
+    },
+    "/api/students/search": {
+      "get": {
+        "summary": "Search Student By Name",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Ali"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/students/1": {
+      "put": {
+        "summary": "Update Student",
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "studentCode": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "dateOfBirth": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "gender": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "studentCode": "STD-1001",
+                "firstName": "Ali",
+                "lastName": "Raza",
+                "email": "ali.khan@example.com",
+                "phone": "03001234567",
+                "dateOfBirth": "2001-05-14",
+                "gender": "Male",
+                "status": "INACTIVE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/students/5": {
+      "delete": {
+        "summary": "Delete Student",
+        "responses": {}
+      }
+    },
+    "/api/courses": {
+      "get": {
+        "summary": "Get All Courses",
+        "responses": {}
+      },
+      "post": {
+        "summary": "Add Course",
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseCode": {
+                    "type": "string"
+                  },
+                  "courseName": {
+                    "type": "string"
+                  },
+                  "creditHours": {
+                    "type": "integer"
+                  },
+                  "department": {
+                    "type": "string"
+                  },
+                  "semester": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "courseCode": "CS-302",
+                "courseName": "Operating Systems",
+                "creditHours": 3,
+                "department": "CS",
+                "semester": "Fall 2026"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/1": {
+      "get": {
+        "summary": "Get Course By ID",
+        "responses": {}
+      },
+      "put": {
+        "summary": "Update Course",
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseCode": {
+                    "type": "string"
+                  },
+                  "courseName": {
+                    "type": "string"
+                  },
+                  "creditHours": {
+                    "type": "integer"
+                  },
+                  "department": {
+                    "type": "string"
+                  },
+                  "semester": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "courseCode": "CS-101",
+                "courseName": "Intro to Computer Science & Programming",
+                "creditHours": 4,
+                "department": "CS",
+                "semester": "Fall 2026"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/search": {
+      "get": {
+        "summary": "Get Course By Department",
+        "parameters": [
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "CS"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/courses/4": {
+      "delete": {
+        "summary": "Delete Course",
+        "responses": {}
+      }
+    },
+    "/api/instructors": {
+      "get": {
+        "summary": "Get All Instructors",
+        "responses": {}
+      },
+      "post": {
+        "summary": "Add Instructor",
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "instructorCode": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "department": {
+                    "type": "string"
+                  },
+                  "designation": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "instructorCode": "INS-201",
+                "name": "Dr. Kamran Akmal",
+                "email": "kamran.akmal@example.com",
+                "phone": "03001234567",
+                "department": "CS",
+                "designation": "Professor"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/instructors/1": {
+      "get": {
+        "summary": "Get Instructor By ID",
+        "responses": {}
+      },
+      "put": {
+        "summary": "Update Instructor",
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "instructorCode": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "department": {
+                    "type": "string"
+                  },
+                  "designation": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "instructorCode": "INS-101",
+                "name": "Dr. Arshad Mehmood",
+                "email": "arshad.mahmood@example.com",
+                "phone": "03001112233",
+                "department": "Computer Science",
+                "designation": "Senior Professor"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/instructors/4": {
+      "delete": {
+        "summary": "Delete Instructor",
+        "responses": {}
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register User",
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "username": "super_staff",
+                "password": "StaffPassword@2026",
+                "role": "STAFF"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login User",
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "username": "super_staff",
+                "password": "StaffPassword@2026"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/enrollments/student/1/course": {
+      "get": {
+        "summary": "Get Courses By Student",
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/enrollments/student/1/course/2": {
+      "delete": {
+        "summary": "Remove Enrollment",
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/enrollments": {
+      "post": {
+        "summary": "Add Enrollment",
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "studentId": {
+                    "type": "integer"
+                  },
+                  "courseId": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "studentId": 1,
+                "courseId": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/enrollments/course/2/student": {
+      "get": {
+        "summary": "Get Students By Course",
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/reports/summary": {
+      "get": {
+        "summary": "Get System Summary Report",
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/reports/departments": {
+      "get": {
+        "summary": "Student By Department Report",
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/students/export/excel": {
+      "get": {
+        "summary": "Export Feature",
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
